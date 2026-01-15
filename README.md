@@ -1,0 +1,257 @@
+# 🚀 LinkedIn Backend (Microservices)
+
+## 📌 Overview
+**linkedin-backend** is a **LinkedIn-like backend system** built using **Spring Boot** and **Spring Cloud**, following a **microservices architecture**.
+
+The primary goal of this project is to **practice real-world backend system design**, focusing on:
+- Scalability
+- Service discovery
+- Gateway-level security
+- Clean service-to-service communication
+
+> ⚠️ **Note:** This is a learning-focused project created to understand **enterprise-level backend architecture and patterns** used in real production systems.
+
+---
+
+## 🏗️ Architecture Overview
+
+The system follows a **gateway-centric microservices architecture** where **all client traffic flows through the API Gateway**.
+
+```
+Client
+  |
+  v
+API Gateway
+(Authentication & Authorization)
+  |
+  +----------------------+
+  |                      |
+Discovery Server     Registered Services
+(Eureka)                  |
+                            |
+        +-------------------+-------------------+
+        |                   |                   |
+  User Service        Posts Service       Connection Service
+   (Postgres)          (Postgres)              (Neo4j)
+```
+
+---
+
+## 🧩 Key Features
+- Service discovery using **Eureka**
+- Centralized routing via **Spring Cloud Gateway**
+- **Authentication & Authorization at API Gateway**
+- Dynamic service registration (no hardcoded URLs)
+- Database-per-service design
+- Independently scalable microservices
+- Clean layered architecture inside each service
+- Feature-based Git workflow
+
+---
+
+## 🔐 Authentication & Authorization
+
+**Implemented at:** `API Gateway`
+
+### Why Gateway-level Security?
+- Centralized access control
+- No duplicate security logic across services
+- Internal services remain focused on business logic
+- Industry-standard approach
+
+### Responsibilities:
+- JWT-based authentication at API Gateway
+- Token validation before request forwarding
+- Injection of authenticated user context (`X-User-Id`) into downstream services
+- Blocking unauthorized requests at gateway level
+
+> Internal microservices trust the API Gateway and are **not directly exposed to clients**.
+
+---
+
+## 🔐 JWT Security Flow
+
+1. User authenticates via `user-service` and receives a JWT token
+2. Client sends the token in `Authorization: Bearer <token>` header
+3. API Gateway validates the JWT signature and expiration
+4. On successful validation, Gateway injects `X-User-Id` header
+5. Downstream services trust the gateway and do not parse JWT
+6. Each service extracts user context from request headers
+
+---
+
+## 🛠️ Tech Stack
+- **Java 17**
+- **Spring Boot**
+- **Spring Cloud (Eureka, Gateway)**
+- **Spring Data JPA**
+- **Maven**
+- **PostgreSQL**
+- **Neo4j**
+- **Docker** (planned)
+- **Apache Kafka** (planned)
+- **Zipkin** (planned)
+
+---
+
+## 🧩 Microservices
+
+### 🔹 Discovery Server
+**Module:** `discovery-server`
+
+- Central service registry
+- Enables dynamic service discovery
+- Required for gateway-based routing
+
+**Port:** `8761`  
+**Dashboard:** http://localhost:8761
+
+---
+
+### 🔹 API Gateway
+**Module:** `api-gateway`
+
+- Single entry point for all client requests
+- Routes requests using service IDs via Eureka
+- Handles authentication & authorization
+- Registered as a Eureka client
+
+---
+
+### 🔹 User Service
+**Module:** `user-service`  
+**Database:** PostgreSQL
+
+**Responsibilities:**
+- User management
+- Password handling utilities
+- Business logic related to users
+
+**Structure:**
+```
+config
+controller
+dto
+entity
+repository
+service
+globalException
+utils (hashPassword, checkPassword)
+```
+
+---
+
+### 🔹 Posts Service
+**Module:** `posts-service`  
+**Database:** PostgreSQL
+
+**Responsibilities:**
+- Post creation and management
+- DTO-based API design
+- Clean layered architecture
+- User context propagation using request interceptors
+
+**Structure:**
+```
+config
+controller
+dto
+entity
+repository
+service
+globalException
+```
+
+---
+
+### 🔹 Connection Service
+**Module:** `connection-service`  
+**Database:** Neo4j (Graph Database)
+
+**Responsibilities:**
+- Manage user-to-user connections
+- Handle relationships such as connections / followers
+- Graph-based modeling for fast relationship traversal
+
+---
+
+## 🗄️ Databases
+
+| Service            | Database   | Purpose |
+|--------------------|------------|---------|
+| user-service       | PostgreSQL | User data |
+| posts-service      | PostgreSQL | Posts data |
+| connection-service | Neo4j      | Relationships |
+
+---
+
+## 🔄 Service Discovery Flow
+1. Discovery Server starts
+2. API Gateway and all services start
+3. Each service registers itself with Eureka
+4. API Gateway routes requests dynamically using service names
+5. Authentication & authorization happen at the gateway layer
+
+---
+
+## ▶️ How to Run (Local)
+
+### 1️⃣ Start Discovery Server
+```bash
+  cd discovery-server
+  ./mvnw spring-boot:run
+```
+
+### 2️⃣ Start API Gateway
+```bash
+  cd api-gateway
+  ./mvnw spring-boot:run
+```
+
+### 3️⃣ Start User Service
+```bash
+  cd user-service
+  ./mvnw spring-boot:run
+```
+
+### 4️⃣ Start Posts Service
+```bash
+  cd posts-service
+  ./mvnw spring-boot:run
+```
+
+### 5️⃣ Start Connection Service
+```bash
+  cd connection-service
+  ./mvnw spring-boot:run
+```
+
+### 6️⃣ Verify
+Open Eureka Dashboard:  
+👉 http://localhost:8761
+
+---
+
+## 🧠 Design Decisions
+
+- Authentication is centralized at the API Gateway to avoid duplication
+- JWT parsing is intentionally avoided in downstream services
+- User identity is propagated using request headers (`X-User-Id`)
+- Each service owns its database to ensure loose coupling
+- Neo4j is used for connection-service to efficiently model graph relationships
+
+---
+
+## 🔮 Future Enhancements
+- Docker & Docker Compose
+- Apache Kafka (event-driven communication)
+- Kubernetes deployment
+- Centralized Config Server
+- Distributed tracing with Zipkin
+- Notification Service
+
+---
+
+## 👨‍💻 Author
+**Vishal Patidar**  
+Backend Developer | Java | Spring Boot | Microservices
