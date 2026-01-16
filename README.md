@@ -40,10 +40,10 @@ Discovery Server     Registered Services
 ## 🧩 Key Features
 - Service discovery using **Eureka**
 - Centralized routing via **Spring Cloud Gateway**
-- **Authentication & Authorization at API Gateway**
+- JWT-based authentication & authorization at API Gateway
 - Dynamic service registration (no hardcoded URLs)
 - Database-per-service design
-- Independently scalable microservices
+- Inter-service communication using **OpenFeign**
 - Clean layered architecture inside each service
 - Feature-based Git workflow
 
@@ -80,10 +80,23 @@ Discovery Server     Registered Services
 
 ---
 
+## 🔁 Inter-Service Communication (OpenFeign)
+
+The project uses **Spring Cloud OpenFeign** for service-to-service communication.
+
+- Services communicate using **service names registered in Eureka**
+- No hardcoded service URLs are used
+- HTTP calls are abstracted as declarative Java interfaces
+- Authenticated user context (`X-User-Id`) is automatically propagated via headers
+
+This keeps inter-service communication **clean, readable, and scalable**.
+
+---
+
 ## 🛠️ Tech Stack
 - **Java 17**
 - **Spring Boot**
-- **Spring Cloud (Eureka, Gateway)**
+- **Spring Cloud (Eureka, Gateway, OpenFeign)**
 - **Spring Data JPA**
 - **Maven**
 - **PostgreSQL**
@@ -243,12 +256,12 @@ Open Eureka Dashboard:
 ---
 
 ## 🔮 Future Enhancements
-- Docker & Docker Compose
-- Apache Kafka (event-driven communication)
-- Kubernetes deployment
-- Centralized Config Server
-- Distributed tracing with Zipkin
-- Notification Service
+- [ ] Docker & Docker Compose
+- [ ] Apache Kafka (event-driven communication)
+- [ ] Kubernetes deployment
+- [ ] Centralized Config Server
+- [ ] Distributed tracing with Zipkin
+- [ ] Notification Service
 
 ---
 
