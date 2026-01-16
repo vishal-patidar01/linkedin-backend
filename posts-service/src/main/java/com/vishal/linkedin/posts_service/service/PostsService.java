@@ -1,6 +1,8 @@
 package com.vishal.linkedin.posts_service.service;
 
 import com.vishal.linkedin.posts_service.auth.UserContextHolder;
+import com.vishal.linkedin.posts_service.clients.ConnectionsClient;
+import com.vishal.linkedin.posts_service.dto.PersonDto;
 import com.vishal.linkedin.posts_service.dto.PostCreateRequestDto;
 import com.vishal.linkedin.posts_service.dto.PostDto;
 import com.vishal.linkedin.posts_service.entity.Post;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.management.Notification;
 import java.util.List;
 
 @Service
@@ -20,6 +23,7 @@ public class PostsService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final ConnectionsClient connectionsClient;
 
     public PostDto createPost(PostCreateRequestDto postDto, Long userId) {
         Post post = modelMapper.map(postDto, Post.class);
@@ -33,6 +37,10 @@ public class PostsService {
         log.debug("Retrieving post with id: {}", postId);
 
         Long userId = UserContextHolder.getCurrentUserId();
+
+        List<PersonDto> firstConnections = connectionsClient.getFirstConnections();
+
+//        TODO send Notification to all Connections
 
         Post post =  postRepository.findById(postId).orElseThrow(() ->
                 new ResourceNotFoundException("Post not found with id: "+ postId));
