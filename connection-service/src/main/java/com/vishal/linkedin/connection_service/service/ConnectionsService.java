@@ -1,5 +1,6 @@
 package com.vishal.linkedin.connection_service.service;
 
+import com.vishal.linkedin.connection_service.auth.UserContextHolder;
 import com.vishal.linkedin.connection_service.entity.Person;
 import com.vishal.linkedin.connection_service.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +16,12 @@ public class ConnectionsService {
 
     private final PersonRepository personRepository;
 
-    public List<Person> getFirstDegreeConnections(Long userId) {
+    public List<Person> getFirstDegreeConnections() {
+        Long userId = UserContextHolder.getCurrentUserId();
         log.info("Getting first degree connections for user with id: {}", userId);
 
         return personRepository.getFirstDegreeConnections(userId);
     }
 
 
-
-    public List<Person> getAllConnections() {
-        log.info("Getting All Connection");
-        return personRepository.getAllConnections();
-    }
 }
