@@ -1,10 +1,8 @@
 package com.vishal.linkedin.posts_service.controller;
 
-import com.vishal.linkedin.posts_service.auth.UserContextHolder;
 import com.vishal.linkedin.posts_service.dto.PostCreateRequestDto;
 import com.vishal.linkedin.posts_service.dto.PostDto;
 import com.vishal.linkedin.posts_service.service.PostsService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +18,8 @@ public class PostsController {
     private final PostsService postsService;
 
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postDto,
-                                              HttpServletRequest httpServletRequest) {
-        PostDto createdPost = postsService.createPost(postDto, 1L);
+    public ResponseEntity<PostDto> createPost(@RequestBody PostCreateRequestDto postDto) {
+        PostDto createdPost = postsService.createPost(postDto);
         return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
     }
 
