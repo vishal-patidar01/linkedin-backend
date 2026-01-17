@@ -93,6 +93,56 @@ This keeps inter-service communication **clean, readable, and scalable**.
 
 ---
 
+## 🔔 Messaging (Apache Kafka)
+
+The system uses **Apache Kafka** for **asynchronous, event-driven communication** between microservices.
+
+Kafka is used for **side effects** like notifications, keeping core business flows **decoupled and non-blocking**.
+
+---
+
+## 🔁 Messaging Flow
+```
+Connection Service
+      |
+      | (SendConnectionRequestEvent)
+      v
+ Kafka Topic
+      |
+      v
+Notification Service
+      |
+      v
+Notification Saved
+```
+---
+
+
+## 📌 Implemented Use Case
+
+**Connection Request Notification**
+
+- `connection-service` publishes an event when a connection request is sent
+- `notification-service` consumes the event and stores a notification
+
+
+
+## 🧩 Kafka Topic
+
+| Topic                         | Producer           | Consumer             |
+|-------------------------------|--------------------|----------------------|
+| send-connection-request-topic | connection-service | notification-service |
+
+
+
+## 🧠 Design Notes
+
+- Messaging is asynchronous
+- Services are loosely coupled
+- Notification failures do not affect core flows
+
+---
+
 ## 🛠️ Tech Stack
 - **Java 17**
 - **Spring Boot**
@@ -255,13 +305,31 @@ Open Eureka Dashboard:
 
 ---
 
-## 🔮 Future Enhancements
-- [ ] Docker & Docker Compose
-- [ ] Apache Kafka (event-driven communication)
-- [ ] Kubernetes deployment
-- [ ] Centralized Config Server
+## 🔮 Feature Status & Future Enhancements
+
+### ✅ Completed Features
+- [x] Microservices architecture using Spring Boot
+- [x] Service discovery with Eureka
+- [x] API Gateway as a single entry point
+- [x] Centralized JWT authentication at API Gateway
+- [x] User context propagation using request headers
+- [x] Inter-service communication using OpenFeign
+- [x] Database-per-service architecture
+- [x] PostgreSQL for relational data
+- [x] Neo4j for connection graph modeling
+- [x] Apache Kafka for asynchronous messaging
+- [x] Event-driven notification system
+- [x] Notification Service consuming Kafka events
+
+---
+
+### ⏳ Future Enhancements
+- [ ] Docker & Docker Compose setup
+- [ ] Centralized Config Server (Spring Cloud Config)
 - [ ] Distributed tracing with Zipkin
-- [ ] Notification Service
+- [ ] Kubernetes deployment
+- [ ] Rate limiting at API Gateway
+- [ ] Monitoring & metrics (Prometheus / Grafana)
 
 ---
 
