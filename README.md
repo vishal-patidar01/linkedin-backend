@@ -45,6 +45,7 @@ Discovery Server     Registered Services
 - Database-per-service design
 - Inter-service communication using **OpenFeign**
 - Clean layered architecture inside each service
+- Fully containerized using Docker & Docker Compose
 - Feature-based Git workflow
 
 ---
@@ -151,8 +152,8 @@ Notification Saved
 - **Maven**
 - **PostgreSQL**
 - **Neo4j**
-- **Docker** (planned)
-- **Apache Kafka** (planned)
+- **Docker & Docker Compose**
+- **Apache Kafka (KRaft mode)**
 - **Zipkin** (planned)
 
 ---
@@ -292,6 +293,54 @@ globalException
 ### 6️⃣ Verify
 Open Eureka Dashboard:  
 👉 http://localhost:8761
+
+---
+
+## 🐳 Docker & Docker Compose Setup
+
+The entire system is fully containerized using **Docker** and **Docker Compose**.
+
+All services, databases, and Kafka are started together using a single command.
+
+### 📦 Containers Included
+- discovery-server
+- api-gateway
+- user-service (PostgreSQL)
+- posts-service (PostgreSQL)
+- connection-service (Neo4j)
+- notification-service (PostgreSQL)
+- Apache Kafka (KRaft mode, no Zookeeper)
+- Kafka UI
+
+---
+
+### ▶️ Run Entire System with Docker
+
+From project root:
+```bash
+  docker-compose up -d
+```
+
+🔍 Verify Running Containers
+
+    docker ps
+
+🛑 Stop All Containers
+
+    docker-compose down
+
+---
+
+🌐 Important URLs
+Service	URL
+
+     API Gateway	        http://localhost:8080
+
+    Eureka Dashboard	http://localhost:8761
+
+    Kafka UI	        http://localhost:8090
+
+    Neo4j Browser	        http://localhost:7474
 
 ---
 
