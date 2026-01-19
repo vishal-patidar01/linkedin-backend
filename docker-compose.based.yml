@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  connections-db:
+    image: neo4j:5
+    container_name: connections-db
+    networks:
+      - linkedin-network
+    environment:
+      NEO4J_AUTH: neo4j/password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - connections-db-data:/data
+
+  discovery-server:
+    image: vishalpatidar123/linkedin-app/discovery-server:latest
+    container_name: discovery-server
+    networks:
+      - linkedin-network
+    ports:
+      - "8761:8761"
+
+  connection-service:
+    image: vishalpatidar123/linkedin-app/connection-service:latest
+    container_name: connection-service
+    networks:
+      - linkedin-network
+    depends_on:
+      - discovery-server
+      - connections-db
+
+
+    # ===================== API GATEWAY =====================
+  api-gateway:
+    image: vishalpatidar123/linkedin-app/api-gateway:latest
+    container_name: api-gateway
+    networks:
+      - linkedin-network
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+
+
+  # ===================== NETWORKS & VOLUMES =====================
+networks:
+    linkedin-network:
+
+volumes:
+  connections-db-data:
+
