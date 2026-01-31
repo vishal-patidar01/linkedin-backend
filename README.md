@@ -33,7 +33,11 @@ Discovery Server     Registered Services
         |                   |                   |
   User Service        Posts Service       Connection Service
    (Postgres)          (Postgres)              (Neo4j)
-```
+        |
+        v
+Notification Service (Kafka Consumer)
+   
+```     
 
 ---
 
@@ -46,6 +50,7 @@ Discovery Server     Registered Services
 - Inter-service communication using **OpenFeign**
 - Clean layered architecture inside each service
 - Fully containerized using Docker & Docker Compose
+- Kubernetes deployment minikube (Ingress + Services)
 - Feature-based Git workflow
 
 ---
@@ -94,6 +99,28 @@ This keeps inter-service communication **clean, readable, and scalable**.
 
 ---
 
+## 🧪 API Usage (Postman)
+#### 🔗 Get All Connections (via API Gateway)
+
+Service: Connection Service
+
+Accessed through: API Gateway
+
+Method: `GET`
+
+### Endpoint
+
+GET: `/api/v1/connections/core`
+
+### Gateway URL
+
+    http://localhost:8080/api/v1/connections/core
+
+### 📸 Get All Connections (Postman)
+
+![Get All Connections](docs/screenshots/postman-get-connections.png)
+---
+
 ## 🔔 Messaging (Apache Kafka)
 
 The system uses **Apache Kafka** for **asynchronous, event-driven communication** between microservices.
@@ -130,10 +157,12 @@ Notification Saved
 
 ## 🧩 Kafka Topic
 
-| Topic                         | Producer           | Consumer             |
-|-------------------------------|--------------------|----------------------|
-| send-connection-request-topic | connection-service | notification-service |
-
+| Topic                           | Producer           | Consumer               |
+|---------------------------------|--------------------|------------------------|
+| send-connection-request-topic   | connection-service | notification-service   |
+| accept-connection-request-topic | connection-service | notification-service   |
+| post-created-topic	          | posts-service	   | notification-service   |
+  post-liked-topic	              | posts-service	    | notification-service  |
 
 
 ## 🧠 Design Notes
@@ -141,6 +170,11 @@ Notification Saved
 - Messaging is asynchronous
 - Services are loosely coupled
 - Notification failures do not affect core flows
+
+
+### 📊 Kafka UI
+
+![Kafka UI](docs/screenshots/kafka-topic.png)
 
 ---
 
@@ -154,6 +188,7 @@ Notification Saved
 - **Neo4j**
 - **Docker & Docker Compose**
 - **Apache Kafka (KRaft mode)**
+- **Kubernetes (Minikube)**
 - **Zipkin** (planned)
 
 ---
@@ -237,6 +272,10 @@ globalException
 - Handle relationships such as connections / followers
 - Graph-based modeling for fast relationship traversal
 
+### 📊 Neo4j Graph Database
+
+![Neo4j Graph Database](docs/screenshots/neo4j-graph.png)
+
 ---
 
 ## 🗄️ Databases
@@ -255,6 +294,10 @@ globalException
 3. Each service registers itself with Eureka
 4. API Gateway routes requests dynamically using service names
 5. Authentication & authorization happen at the gateway layer
+
+### 🧭 Eureka Dashboard
+
+![Eureka Dashboard](docs/screenshots/eureka.png)
 
 ---
 
@@ -323,25 +366,94 @@ From project root:
 
 🔍 Verify Running Containers
 
-    docker ps
+` docker ps`
 
 🛑 Stop All Containers
 
-    docker-compose down
+`docker-compose down`
 
 ---
 
 🌐 Important URLs
 Service	URL
 
-     API Gateway	        http://localhost:8080
+    API Gateway	        http://localhost:8080
 
-    Eureka Dashboard	http://localhost:8761
+    Eureka Dashboard        http://localhost:8761
 
-    Kafka UI	        http://localhost:8090
+    Kafka UI                http://localhost:8090
 
     Neo4j Browser	        http://localhost:7474
 
+---
+
+## ☸️ Kubernetes Deployment
+
+This project supports running all microservices on Kubernetes using 
+Minikube for local development and testing.
+
+### Components Used
+
+- Deployments
+- Services (ClusterIP / NodePort)
+- ConfigMaps
+- NGINX Ingress Controller
+- Minikube
+
+### 📁 Kubernetes Manifests Structure
+```
+k8s/
+├── api-gateway.yml
+├── connection-db.yml
+├── connection-service.yml
+├── ingress.yml
+├── kafka.yml
+├── kafka-bootstrap.yml
+├── kafka-configmap.yml
+├── kafka-ui.yml
+├── notification-db.yml
+├── notification-service.yml
+├── posts-db.yml
+├── posts-service.yml
+├── user-db.yml
+├── user-service.yml
+```
+### 🧩 Deploy to Kubernetes
+#### 1️⃣ Create namespace:
+
+    kubectl apply -f k8s/namespace.yaml
+
+#### 2️⃣ Deploy all services:
+
+    kubectl apply -f k8s/ -n linkedin-app
+
+#### 3️⃣ Verify pods:
+
+    kubectl get pods -n linkedin-app
+
+### 🌐 Kubernetes URLs
+Service	URL
+
+API Gateway :  `http://linkedin.local`
+
+Kafka UI : `http://linkedin.local/kafka-ui`
+
+### 🧭 Minikube Deployment
+
+![Kubernetes](docs/screenshots/minikube-deployment.png)
+
+
+### 📦 Prerequisites
+ Make sure the following tools are installed on your system:
+
+    - Docker
+    - kubectl
+    - Minikube
+### Verify installation: 
+
+    docker --version
+    kubectl version --client
+    minikube version
 ---
 
 ## 🧠 Design Decisions
@@ -367,18 +479,10 @@ Service	URL
 - [x] PostgreSQL for relational data
 - [x] Neo4j for connection graph modeling
 - [x] Apache Kafka for asynchronous messaging
+- [x] Docker & Docker Compose setup
 - [x] Event-driven notification system
 - [x] Notification Service consuming Kafka events
-
----
-
-### ⏳ Future Enhancements
-- [ ] Docker & Docker Compose setup
-- [ ] Centralized Config Server (Spring Cloud Config)
-- [ ] Distributed tracing with Zipkin
-- [ ] Kubernetes deployment
-- [ ] Rate limiting at API Gateway
-- [ ] Monitoring & metrics (Prometheus / Grafana)
+- [x] Kubernetes deployment
 
 ---
 
