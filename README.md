@@ -28,9 +28,9 @@ API Gateway
   |                      |
 Discovery Server     Registered Services
 (Eureka)                  |
-                            |
-        +-------------------+-------------------+
-        |                   |                   |
+                          |
+        +-----------------+-------------------+
+        |                 |                   |
   User Service        Posts Service       Connection Service
    (Postgres)          (Postgres)              (Neo4j)
         |
