@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-service
+  namespace: linkedin-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: posts-service
+  template:
+    metadata:
+      labels:
+        app: posts-service
+    spec:
+      containers:
+        - name: posts-service
+          image: docker.io/vishalpatidar123/linkedin-app-posts-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9010
+
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "100m"
+            limits:
+              memory: "400Mi"
+              cpu: "200m"
+          env:
+            # Spring profile
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=70 -XX:InitialRAMPercentage=40"
+
+            # DB
+#            - name: DB_SERVICE
+#              value: posts-db
+#            - name: DB_NAME
+#              value: postsDB
+#            - name: DB_USER
+#              value: user
+#            - name: DB_PASSWORD
+#              value: password
+
+            #  KAFKA
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-0.kafka:9092
+
+            - name: SPRING_KAFKA_ADMIN_AUTO_CREATE
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: posts-service
+  namespace: linkedin-app
+spec:
+  selector:
+    app: posts-service
+  ports:
+    - port: 9010
+      targetPort: 9010
+  type: ClusterIP
+

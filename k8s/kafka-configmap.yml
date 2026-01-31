@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-config
+  namespace: linkedin-app
+data:
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-0.kafka:9092
+  SPRING_KAFKA_ADMIN_ENABLED: "true"
+  SPRING_KAFKA_ADMIN_AUTO_CREATE: "true"

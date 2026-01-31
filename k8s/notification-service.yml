@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: linkedin-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: docker.io/vishalpatidar123/linkedin-app-notification-service:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9040
+
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "200m"
+            limits:
+              memory: "800Mi"
+              cpu: "500m"
+
+          env:
+            # Spring profile
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=65 -XX:InitialRAMPercentage=40"
+
+
+            # Eureka
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://discovery-server:8761/eureka
+
+
+            # - name: DB_USER
+            #   value: user
+            # - name: DB_PASSWORD
+            #   value: password
+            # - name: DB_SERVICE
+            #   value: notification-db
+            # - name: DB_NAME
+            #   value: notificationDB
+
+            #  KAFKA
+#            - name: KAFKA_BOOTSTRAP_SERVERS
+#              value: kafka-0.kafka:9092
+
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-bootstrap:9092
+
+            # Kafka Admin
+            - name: SPRING_KAFKA_ADMIN_ENABLED
+              value: "true"
+            - name: SPRING_KAFKA_ADMIN_AUTO_CREATE
+              value: "true"
+            - name: SPRING_KAFKA_ADMIN_FAIL_FAST
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: linkedin-app
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 80
+      targetPort: 9040
+  type: ClusterIP
+
+
