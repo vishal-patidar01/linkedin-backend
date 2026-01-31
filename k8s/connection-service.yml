@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: connection-service
+  namespace: linkedin-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: connection-service
+  template:
+    metadata:
+      labels:
+        app: connection-service
+    spec:
+      containers:
+        - name: connection-service
+          image: docker.io/vishalpatidar123/linkedin-app-connection-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9030
+
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "150m"
+            limits:
+              memory: "900Mi"
+              cpu: "400m"
+          env:
+            # Spring profile
+            - name: SPRING_PROFILES_ACTIVE
+              value: k8s
+
+            # Eureka
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: http://discovery-server:8761/eureka
+
+            # Neo4j
+            - name: SPRING_NEO4J_URI
+              value: bolt://neo4j:7687
+            - name: SPRING_NEO4J_AUTHENTICATION_USERNAME
+              value: neo4j
+            - name: SPRING_NEO4J_AUTHENTICATION_PASSWORD
+              value: password
+
+            #  KAFKA
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-0.kafka:9092
+
+            # Kafka Admin
+            - name: SPRING_KAFKA_ADMIN_ENABLED
+              value: "true"
+            - name: SPRING_KAFKA_ADMIN_AUTO_CREATE
+              value: "true"
+            - name: SPRING_KAFKA_ADMIN_FAIL_FAST
+              value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: connection-service
+  namespace: linkedin-app
+spec:
+  selector:
+    app: connection-service
+  ports:
+    - port: 80
+      targetPort: 9030
+  type: ClusterIP
+
+
